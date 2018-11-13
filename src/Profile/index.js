@@ -8,16 +8,21 @@ import RepositoryList, { REPOSITORY_FRAGMENT } from '../Repository'
 import ErrorMessage from '../Error'
 
 const GET_CURRENT_USER = gql`
-  {
+  query($cursor: String) {
     viewer {
       repositories(
         first: 5
+        after: $cursor
         orderBy: { field: STARGAZERS, direction: DESC }
       ) {
         edges {
           node {
             ...repository
           }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
         }
       }
     }
@@ -27,15 +32,26 @@ const GET_CURRENT_USER = gql`
 `
 
 const Profile = () => (
-  <Query query={GET_CURRENT_USER} errorPolicy="all">
-    {({ data, loading, error }) => {
+  <Query 
+    query={GET_CURRENT_USER} 
+    errorPolicy="all"
+    notifyOnNetworkStatusChange={true}
+  >
+    {({ data, loading, error, fetchMore }) => {
       if (error) { return <ErrorMessage error={error} /> }
 
       const { viewer } = data
       
-      if (loading || !viewer) { return <Loading /> }
+      if (loading && !viewer) { return <Loading /> }
 
-      return <RepositoryList repositories={viewer.repositories} />
+      return ( 
+        <RepositoryList
+          loading={loading}
+          repositories={viewer.repositories} 
+          fetchMore={fetchMore}
+          entry={'viewer'}
+        />
+      )
     }}
   </Query>
 );

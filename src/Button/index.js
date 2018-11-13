@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-import './style.css';
+import './style.css'
 
 const Button = ({
   children,
@@ -16,6 +16,23 @@ const Button = ({
   >
     {children}
   </button>
-);
+)
 
-export default Button;
+const ButtonUnobtrusive = ({
+  children,
+  className,
+  type = 'button',
+  ...props
+}) => (
+  <button
+    className={`${className} Button_unobtrusive`}
+    type={type}
+    {...props}
+  >
+    {children}
+  </button>
+)
+
+export { ButtonUnobtrusive }
+
+export default Button
